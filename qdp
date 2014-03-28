@@ -1,0 +1,355 @@
+#!/bin/sh
+# quick & dirty plot
+# uses pyxplot to create a quick & dirty xy plot from a single-file with a single-column
+
+# defcolors=(blue olivegreen brickred grey sepia tan black magenta periwinkle orange)
+xcol=1
+ycol=(2)
+
+# defaults
+defaultcolor=(blue black green brickred gray turquoise magenta pinegreen sepia burntorange)   
+defaultpt=(1 15 2 3 4 5 6 7 8 9)
+
+usage() {
+  echo "usage: $0 [options] [-o output] [datafile]" 1>&2
+  echo " no datafile indicates stdin" 1>&2;
+  echo " if no output is given, basename is assumed equal to datafile" 1>&2;
+  echo " if neither output nor datafile given, basename output is qdp" 1>&2;
+#   echo " both .png and .pdf will be appended to output" 1>&2;
+  echo "     --xcol <int>            set x column in datafile, default 1" 1>&2;
+  echo "     --ycol <int>            set y columns in datafile, default 2" 1>&2;
+  echo "     --xlabel <string>       set x axis label, default none" 1>&2;
+  echo "     --ylabel <string>       set y axis label, default none" 1>&2;
+  echo "     --xrange <range>        set x axis range, default auto" 1>&2;
+  echo "     --yrange <range>        set y axis range, default auto" 1>&2;
+  echo "     --with <string>         set with, default linespoints" 1>&2;
+  echo "     --lt <string>           set linetype, default 1" 1>&2;
+  echo "     --lw <float>            set linewdith, default 1" 1>&2;
+  echo "     --plw <float>           set pointlinewdiths" 1>&2;
+  echo "     --ps <float>            set pointsizes" 1>&2;
+  echo "     --pt <int>              set pointtype" 1>&2;
+  echo "     --pi <int>              set pointinterval (extension to pyxplot)" 1>&2;
+  echo "     --color <string>        set colors" 1>&2;
+  echo "     --ti <string>           set data title, default none" 1>&2;
+  echo "     --plottitle <string>    set plot title, default none" 1>&2;
+  echo "     --key <string>          set key location, default top right" 1>&2;
+  echo "     --header <file>         use <file> as template instead of default" 1>&2;
+  exit 1
+}
+
+
+ARGS=`getopt -o ":o:h" -l "plottitle:,ti:,xcol:,ycol:,xlabel:,ylabel:,xrange:,yrange:,with:,lt:,lw:,plw:,ps:,pt:,pi:,color:,header:,key:,help" -n "$0" -- "$@"`
+# echo $ARGS
+if [ $? -ne 0 ];
+then
+  exit 1
+fi
+eval set -- "$ARGS"
+ 
+# Now go through all the options
+while true;
+do
+  case "$1" in
+    -h|--help)
+      usage
+      exit 1;;
+
+    --plottitle)
+      if [ -n "$2" ];
+      then
+        plottitle="$2"
+      fi
+      shift 2;;
+
+    --ti)
+      if [ -n "$2" ];
+      then
+        ti=($2)
+      fi
+      shift 2;;
+
+    -o)
+      if [ -n "$2" ];
+      then
+        output="$2"
+      fi
+      shift 2;;
+
+    --xcol)
+      if [ -n "$2" ];
+      then
+        xcol="$2"
+      fi
+      shift 2;;
+
+    --ycol)
+      if [ -n "$2" ];
+      then
+        ycol=($2)
+      fi
+      shift 2;;
+
+    --xlabel)
+      if [ -n "$2" ];
+      then
+        xlabel="$2"
+      fi
+      shift 2;;
+
+    --ylabel)
+      if [ -n "$2" ];
+      then
+        ylabel="$2"
+      fi
+      shift 2;;
+
+    --xrange)
+      if [ -n "$2" ];
+      then
+        xrange="$2"
+      fi
+      shift 2;;
+
+    --yrange)
+      if [ -n "$2" ];
+      then
+        yrange="$2"
+      fi
+      shift 2;;
+
+    --with)
+      if [ -n "$2" ];
+      then
+        with=($2)
+      fi
+      shift 2;;
+
+    --lt)
+      if [ -n "$2" ];
+      then
+        lt=($2)
+      fi
+      shift 2;;
+
+    --lw)
+      if [ -n "$2" ];
+      then
+        lw=($2)
+      fi
+      shift 2;;
+
+    --plw)
+      if [ -n "$2" ];
+      then
+        plw=($2)
+      fi
+      shift 2;;
+
+    --ps)
+      if [ -n "$2" ];
+      then
+        ps=($2)
+      fi
+      shift 2;;
+
+    --pt)
+      if [ -n "$2" ];
+      then
+        pt=($2)
+      fi
+      shift 2;;
+
+    --pi)
+      if [ -n "$2" ];
+      then
+        pi=($2)
+      fi
+      shift 2;;
+
+    --color)
+      if [ -n "$2" ];
+      then
+        color=($2)
+      fi
+      shift 2;;
+
+    --header)
+      if [ -n "$2" ];
+      then
+        header="$2"
+      fi
+      shift 2;;
+ 
+    --key)
+      if [ -n "$2" ];
+      then
+        key="$2"
+      fi
+      shift 2;;
+
+    --)
+      shift
+      break;;
+  esac
+done
+
+shift $((OPTIND-1))
+
+if [ -z "$1" ]; then
+   data=`mktemp`
+#   data="qdp.dat"
+   cat > $data
+else
+  data="$1"
+fi
+
+
+
+if [ -z "$output" ]; then
+  if [ "$data" = "-" ]; then
+    output="qdp"
+  else
+    output="$1"
+  fi
+fi
+
+# pplfile="qdp.ppl"
+pplfile=`mktemp`
+
+if [ "$header" != "" ]; then
+  if [ ! -e "$header" ]; then
+    echo "header file $header does not exist"
+    exit 1
+  fi
+  cat $header >> $pplfile
+else
+  # default header
+  echo "set preamble \"\\usepackage{amsmath}\"" >> $pplfile
+  echo "set width 12*unit(cm)" >> $pplfile
+  echo "set axis x arrow nomirrored" >> $pplfile
+  echo "set axis y arrow nomirrored" >> $pplfile
+  echo "set nomxtics"  >> $pplfile
+  echo >> $pplfile
+  echo "set style data linespoints" >> $pplfile
+fi
+
+echo >> $pplfile
+
+if [ ! -z "$plottitle" ]; then
+  echo "set title \"$plottitle\"" >> $pplfile
+fi
+if [ ! -z "$xlabel" ]; then
+ echo "set xlabel \"$xlabel\"" >> $pplfile
+fi
+if [ ! -z "$ylabel"  ]; then
+ echo "set ylabel \"$ylabel\"" >> $pplfile
+fi
+if [ ! -z "$xrange" ]; then
+ echo "set xrange $xrange" >> $pplfile
+fi
+if [ ! -z "$yrange" ]; then
+ echo "set yrange $yrange" >> $pplfile
+fi
+if [ ! -z "$key" ]; then
+ echo "set key $key" >> $pplfile
+fi
+
+echo "set terminal pdf" >> $pplfile
+escappedoutput=`echo $output | sed s/\\\\./-/g`
+echo "set output \"$escappedoutput.pdf\"" >> $pplfile
+
+
+# ncols=`cat file | awk '{print NF}'`
+echo -n "plot " >> $pplfile
+
+i=0
+while [ ! -z "${ycol[$i]}" ]; do
+
+# extension to pyxplot: it doesn't handle w lp pi 10
+ if [ -z "${pi[$i]}" ]; then
+  echo -n "\"$data\" u $xcol:${ycol[$i]} "  >> $pplfile
+
+  if [ -z "${with[$i]}" ]; then
+   echo -n " w lp" >> $pplfile;
+  else
+   echo -n " w ${with[$i]}" >> $pplfile;
+  fi
+
+  if [ ! -z "${lw[$i]}" ];    then  echo -n " lw ${lw[$i]}"        >> $pplfile; fi
+  if [ ! -z "${lt[$i]}" ];    then  echo -n " lt ${lt[$i]}"        >> $pplfile; fi
+
+  if [ ! -z "${pt[$i]}" ]; then
+    echo -n " pt ${pt[$i]}"               >> $pplfile
+  elif [ ! -z "${defaultpt[$i]}" ]; then
+    echo -n " pt ${defaultpt[$i]}"        >> $pplfile
+  fi
+
+  if [ ! -z "${plw[$i]}" ];   then  echo -n " plw ${plw[$i]}"      >> $pplfile; fi
+  if [ ! -z "${ps[$i]}" ];    then  echo -n " ps ${ps[$i]}"        >> $pplfile; fi
+
+  if [ ! -z "${color[$i]}" ]; then
+    echo -n " color ${color[$i]}"         >> $pplfile
+  elif [ ! -z "${defaultcolor[$i]}" ]; then
+    echo -n " color ${defaultcolor[$i]}"  >> $pplfile
+  fi
+
+  if [ ! -z "${ti[$i]}" ];    then
+   echo -n " ti \"${ti[$i]}\""    >> $pplfile
+  else
+   echo -n " ti \"\""             >> $pplfile
+  fi
+
+ else
+  echo -n "\"$data\" u $xcol:${ycol[$i]} every ${pi[$i]} w p"  >> $pplfile
+  if [ ! -z "${lt[$i]}" ];    then  echo -n " lt ${lt[$i]}"        >> $pplfile; fi
+
+  if [ ! -z "${pt[$i]}" ]; then
+    echo -n " pt ${pt[$i]}"               >> $pplfile
+  elif [ ! -z "${defaultpt[$i]}" ]; then
+    echo -n " pt ${defaultpt[$i]}"        >> $pplfile
+  fi
+
+  if [ ! -z "${plw[$i]}" ];   then  echo -n " plw ${plw[$i]}"      >> $pplfile; fi
+  if [ ! -z "${ps[$i]}" ];    then  echo -n " ps ${ps[$i]}"        >> $pplfile; fi
+  if [ ! -z "${color[$i]}" ]; then
+    echo -n " color ${color[$i]}"         >> $pplfile
+  elif [ ! -z "${defaultcolor[$i]}" ]; then
+    echo -n " color ${defaultcolor[$i]}"  >> $pplfile
+  fi
+
+  if [ ! -z "${ti[$i]}" ];    then
+   echo -n " ti \"${ti[$i]}\""    >> $pplfile
+  else
+   echo -n " ti \"\""             >> $pplfile
+  fi
+
+  echo -n ", \"$data\" u $xcol:${ycol[$i]} w l "  >> $pplfile
+  if [ ! -z "${lw[$i]}" ];    then  echo -n " lw ${lw[$i]}"        >> $pplfile; fi
+  if [ ! -z "${lt[$i]}" ];    then  echo -n " lt ${lt[$i]}"        >> $pplfile; fi
+  if [ ! -z "${color[$i]}" ]; then
+    echo -n " color ${color[$i]}"         >> $pplfile
+  elif [ ! -z "${defaultcolor[$i]}" ]; then
+    echo -n " color ${defaultcolor[$i]}"  >> $pplfile
+  fi
+  echo -n " ti \"\""             >> $pplfile
+ fi
+
+
+ i=`echo $i + 1 | bc`
+ if [ ! -z "${ycol[$i]}" ]; then
+  echo -n ", " >> $pplfile
+ fi
+done
+
+echo >> $pplfile
+
+
+echo "set terminal png dpi 127" >> $pplfile
+echo "set output \"$escappedoutput.png\"" >> $pplfile
+
+echo "replot" >> $pplfile
+
+# TODO: debugo
+# cat $pplfile
+pyxplot $pplfile
+# rm $pplfile

@@ -1,0 +1,19 @@
+quick & dirty plot
+==================
+
+qdp is a bash script that interfaces with pyxplot (http://pyxplot.org.uk)
+so as to generate scientific plots from the commandline. As pyxplot
+itself, qdp has some defaults that should satisfy the user more often
+than not. If it is not the case, there are plenty of commandline options
+that control how the plots are generated. The output consists of both
+a PDF and a PNG file with the plot.
+
+In any case, as its name suggest, qdp is _quick_ and _dirty_ so if
+something does not work as you expect, feel free to modify it to suit
+your needs. It was originally written to enhance the scriptability of
+wasora (http://www.talador.com.ar/jeremy/wasora).
+
+qdp is copyright (C) 2013-2014 jeremy theler <jeremy@talador.com.ar>
+licensed under GNU GPL version 3 or later.
+wasora is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
