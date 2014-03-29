@@ -33,12 +33,13 @@ usage() {
   echo "     --ti <string>           set data title, default none" 1>&2;
   echo "     --plottitle <string>    set plot title, default none" 1>&2;
   echo "     --key <string>          set key location, default top right" 1>&2;
+  echo "     --pre <string>          execute pyxplot commands in  <string> before plotting" 1>&2;
   echo "     --header <file>         use <file> as template instead of default" 1>&2;
   exit 1
 }
 
 
-ARGS=`getopt -o ":o:h" -l "plottitle:,ti:,xcol:,ycol:,xlabel:,ylabel:,xrange:,yrange:,with:,lt:,lw:,plw:,ps:,pt:,pi:,color:,header:,key:,help" -n "$0" -- "$@"`
+ARGS=`getopt -o ":o:h" -l "plottitle:,ti:,xcol:,ycol:,xlabel:,ylabel:,xrange:,yrange:,with:,lt:,lw:,plw:,ps:,pt:,pi:,color:,pre:,header:,key:,help" -n "$0" -- "$@"`
 # echo $ARGS
 if [ $? -ne 0 ];
 then
@@ -173,6 +174,13 @@ do
       fi
       shift 2;;
 
+    --pre)
+      if [ -n "$2" ];
+      then
+        pre="$2"
+      fi
+      shift 2;;
+
     --header)
       if [ -n "$2" ];
       then
@@ -216,140 +224,144 @@ fi
 # pplfile="qdp.ppl"
 pplfile=`mktemp`
 
-if [ "$header" != "" ]; then
-  if [ ! -e "$header" ]; then
-    echo "header file $header does not exist"
+if [ ! -z "${header}" ]; then
+  if [ ! -e "${header}" ]; then
+    echo "header file ${header} does not exist"
     exit 1
   fi
-  cat $header >> $pplfile
+  cat ${header} >> ${pplfile}
 else
   # default header
-  echo "set preamble \"\\usepackage{amsmath}\"" >> $pplfile
-  echo "set width 12*unit(cm)" >> $pplfile
-  echo "set axis x arrow nomirrored" >> $pplfile
-  echo "set axis y arrow nomirrored" >> $pplfile
-  echo "set nomxtics"  >> $pplfile
-  echo >> $pplfile
-  echo "set style data linespoints" >> $pplfile
+  echo "set preamble \"\\usepackage{amsmath}\"" >> ${pplfile}
+  echo "set width 12*unit(cm)" >> ${pplfile}
+  echo "set axis x arrow nomirrored" >> ${pplfile}
+  echo "set axis y arrow nomirrored" >> ${pplfile}
+  echo "set nomxtics"  >> ${pplfile}
+  echo >> ${pplfile}
+  echo "set style data linespoints" >> ${pplfile}
 fi
 
-echo >> $pplfile
+if [ ! -z "${pre}" ]; then
+  echo ${pre} >> ${pplfile}
+fi
+
+echo >> ${pplfile}
 
 if [ ! -z "$plottitle" ]; then
-  echo "set title \"$plottitle\"" >> $pplfile
+  echo "set title \"$plottitle\"" >> ${pplfile}
 fi
 if [ ! -z "$xlabel" ]; then
- echo "set xlabel \"$xlabel\"" >> $pplfile
+ echo "set xlabel \"$xlabel\"" >> ${pplfile}
 fi
 if [ ! -z "$ylabel"  ]; then
- echo "set ylabel \"$ylabel\"" >> $pplfile
+ echo "set ylabel \"$ylabel\"" >> ${pplfile}
 fi
 if [ ! -z "$xrange" ]; then
- echo "set xrange $xrange" >> $pplfile
+ echo "set xrange $xrange" >> ${pplfile}
 fi
 if [ ! -z "$yrange" ]; then
- echo "set yrange $yrange" >> $pplfile
+ echo "set yrange $yrange" >> ${pplfile}
 fi
 if [ ! -z "$key" ]; then
- echo "set key $key" >> $pplfile
+ echo "set key $key" >> ${pplfile}
 fi
 
-echo "set terminal pdf" >> $pplfile
+echo "set terminal pdf" >> ${pplfile}
 escappedoutput=`echo $output | sed s/\\\\./-/g`
-echo "set output \"$escappedoutput.pdf\"" >> $pplfile
+echo "set output \"$escappedoutput.pdf\"" >> ${pplfile}
 
 
 # ncols=`cat file | awk '{print NF}'`
-echo -n "plot " >> $pplfile
+echo -n "plot " >> ${pplfile}
 
 i=0
 while [ ! -z "${ycol[$i]}" ]; do
 
 # extension to pyxplot: it doesn't handle w lp pi 10
  if [ -z "${pi[$i]}" ]; then
-  echo -n "\"$data\" u $xcol:${ycol[$i]} "  >> $pplfile
+  echo -n "\"$data\" u $xcol:${ycol[$i]} "  >> ${pplfile}
 
   if [ -z "${with[$i]}" ]; then
-   echo -n " w lp" >> $pplfile;
+   echo -n " w lp" >> ${pplfile};
   else
-   echo -n " w ${with[$i]}" >> $pplfile;
+   echo -n " w ${with[$i]}" >> ${pplfile};
   fi
 
-  if [ ! -z "${lw[$i]}" ];    then  echo -n " lw ${lw[$i]}"        >> $pplfile; fi
-  if [ ! -z "${lt[$i]}" ];    then  echo -n " lt ${lt[$i]}"        >> $pplfile; fi
+  if [ ! -z "${lw[$i]}" ];    then  echo -n " lw ${lw[$i]}"        >> ${pplfile}; fi
+  if [ ! -z "${lt[$i]}" ];    then  echo -n " lt ${lt[$i]}"        >> ${pplfile}; fi
 
   if [ ! -z "${pt[$i]}" ]; then
-    echo -n " pt ${pt[$i]}"               >> $pplfile
+    echo -n " pt ${pt[$i]}"               >> ${pplfile}
   elif [ ! -z "${defaultpt[$i]}" ]; then
-    echo -n " pt ${defaultpt[$i]}"        >> $pplfile
+    echo -n " pt ${defaultpt[$i]}"        >> ${pplfile}
   fi
 
-  if [ ! -z "${plw[$i]}" ];   then  echo -n " plw ${plw[$i]}"      >> $pplfile; fi
-  if [ ! -z "${ps[$i]}" ];    then  echo -n " ps ${ps[$i]}"        >> $pplfile; fi
+  if [ ! -z "${plw[$i]}" ];   then  echo -n " plw ${plw[$i]}"      >> ${pplfile}; fi
+  if [ ! -z "${ps[$i]}" ];    then  echo -n " ps ${ps[$i]}"        >> ${pplfile}; fi
 
   if [ ! -z "${color[$i]}" ]; then
-    echo -n " color ${color[$i]}"         >> $pplfile
+    echo -n " color ${color[$i]}"         >> ${pplfile}
   elif [ ! -z "${defaultcolor[$i]}" ]; then
-    echo -n " color ${defaultcolor[$i]}"  >> $pplfile
+    echo -n " color ${defaultcolor[$i]}"  >> ${pplfile}
   fi
 
   if [ ! -z "${ti[$i]}" ];    then
-   echo -n " ti \"${ti[$i]}\""    >> $pplfile
+   echo -n " ti \"${ti[$i]}\""    >> ${pplfile}
   else
-   echo -n " ti \"\""             >> $pplfile
+   echo -n " ti \"\""             >> ${pplfile}
   fi
 
  else
-  echo -n "\"$data\" u $xcol:${ycol[$i]} every ${pi[$i]} w p"  >> $pplfile
-  if [ ! -z "${lt[$i]}" ];    then  echo -n " lt ${lt[$i]}"        >> $pplfile; fi
+  echo -n "\"$data\" u $xcol:${ycol[$i]} every ${pi[$i]} w p"  >> ${pplfile}
+  if [ ! -z "${lt[$i]}" ];    then  echo -n " lt ${lt[$i]}"        >> ${pplfile}; fi
 
   if [ ! -z "${pt[$i]}" ]; then
-    echo -n " pt ${pt[$i]}"               >> $pplfile
+    echo -n " pt ${pt[$i]}"               >> ${pplfile}
   elif [ ! -z "${defaultpt[$i]}" ]; then
-    echo -n " pt ${defaultpt[$i]}"        >> $pplfile
+    echo -n " pt ${defaultpt[$i]}"        >> ${pplfile}
   fi
 
-  if [ ! -z "${plw[$i]}" ];   then  echo -n " plw ${plw[$i]}"      >> $pplfile; fi
-  if [ ! -z "${ps[$i]}" ];    then  echo -n " ps ${ps[$i]}"        >> $pplfile; fi
+  if [ ! -z "${plw[$i]}" ];   then  echo -n " plw ${plw[$i]}"      >> ${pplfile}; fi
+  if [ ! -z "${ps[$i]}" ];    then  echo -n " ps ${ps[$i]}"        >> ${pplfile}; fi
   if [ ! -z "${color[$i]}" ]; then
-    echo -n " color ${color[$i]}"         >> $pplfile
+    echo -n " color ${color[$i]}"         >> ${pplfile}
   elif [ ! -z "${defaultcolor[$i]}" ]; then
-    echo -n " color ${defaultcolor[$i]}"  >> $pplfile
+    echo -n " color ${defaultcolor[$i]}"  >> ${pplfile}
   fi
 
   if [ ! -z "${ti[$i]}" ];    then
-   echo -n " ti \"${ti[$i]}\""    >> $pplfile
+   echo -n " ti \"${ti[$i]}\""    >> ${pplfile}
   else
-   echo -n " ti \"\""             >> $pplfile
+   echo -n " ti \"\""             >> ${pplfile}
   fi
 
-  echo -n ", \"$data\" u $xcol:${ycol[$i]} w l "  >> $pplfile
-  if [ ! -z "${lw[$i]}" ];    then  echo -n " lw ${lw[$i]}"        >> $pplfile; fi
-  if [ ! -z "${lt[$i]}" ];    then  echo -n " lt ${lt[$i]}"        >> $pplfile; fi
+  echo -n ", \"$data\" u $xcol:${ycol[$i]} w l "  >> ${pplfile}
+  if [ ! -z "${lw[$i]}" ];    then  echo -n " lw ${lw[$i]}"        >> ${pplfile}; fi
+  if [ ! -z "${lt[$i]}" ];    then  echo -n " lt ${lt[$i]}"        >> ${pplfile}; fi
   if [ ! -z "${color[$i]}" ]; then
-    echo -n " color ${color[$i]}"         >> $pplfile
+    echo -n " color ${color[$i]}"         >> ${pplfile}
   elif [ ! -z "${defaultcolor[$i]}" ]; then
-    echo -n " color ${defaultcolor[$i]}"  >> $pplfile
+    echo -n " color ${defaultcolor[$i]}"  >> ${pplfile}
   fi
-  echo -n " ti \"\""             >> $pplfile
+  echo -n " ti \"\""             >> ${pplfile}
  fi
 
 
  i=`echo $i + 1 | bc`
  if [ ! -z "${ycol[$i]}" ]; then
-  echo -n ", " >> $pplfile
+  echo -n ", " >> ${pplfile}
  fi
 done
 
-echo >> $pplfile
+echo >> ${pplfile}
 
 
-echo "set terminal png dpi 127" >> $pplfile
-echo "set output \"$escappedoutput.png\"" >> $pplfile
+echo "set terminal png dpi 127" >> ${pplfile}
+echo "set output \"$escappedoutput.png\"" >> ${pplfile}
 
-echo "replot" >> $pplfile
+echo "replot" >> ${pplfile}
 
 # TODO: debugo
-# cat $pplfile
-pyxplot $pplfile
-# rm $pplfile
+# cat ${pplfile}
+pyxplot ${pplfile}
+# rm ${pplfile}
