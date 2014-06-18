@@ -11,30 +11,32 @@ defaultcolor=(blue black green brickred gray turquoise magenta pinegreen sepia b
 defaultpt=(1 15 2 3 4 5 6 7 8 9)
 
 usage() {
-  echo "usage: $0 [options] [-o output] [datafile]" 1>&2
-  echo " no datafile indicates stdin" 1>&2;
-  echo " if no output is given, basename is assumed equal to datafile" 1>&2;
-  echo " if neither output nor datafile given, basename output is qdp" 1>&2;
-#   echo " both .png and .pdf will be appended to output" 1>&2;
-  echo "     --xcol <int>            set x column in datafile, default 1" 1>&2;
-  echo "     --ycol <int>            set y columns in datafile, default 2" 1>&2;
-  echo "     --xlabel <string>       set x axis label, default none" 1>&2;
-  echo "     --ylabel <string>       set y axis label, default none" 1>&2;
-  echo "     --xrange <range>        set x axis range, default auto" 1>&2;
-  echo "     --yrange <range>        set y axis range, default auto" 1>&2;
-  echo "     --with <string>         set with, default linespoints" 1>&2;
-  echo "     --lt <string>           set linetype, default 1" 1>&2;
-  echo "     --lw <float>            set linewdith, default 1" 1>&2;
-  echo "     --plw <float>           set pointlinewdiths" 1>&2;
-  echo "     --ps <float>            set pointsizes" 1>&2;
-  echo "     --pt <int>              set pointtype" 1>&2;
-  echo "     --pi <int>              set pointinterval (extension to pyxplot)" 1>&2;
-  echo "     --color <string>        set colors" 1>&2;
-  echo "     --ti <string>           set data title, default none" 1>&2;
-  echo "     --plottitle <string>    set plot title, default none" 1>&2;
-  echo "     --key <string>          set key location, default top right" 1>&2;
-  echo "     --pre <string>          execute pyxplot commands in  <string> before plotting" 1>&2;
-  echo "     --header <file>         use <file> as template instead of default" 1>&2;
+ cat << EOF 1>&2
+usage: $0 [options] [-o output] [datafile]
+ no datafile indicates stdin
+ if no output is given, basename is assumed equal to datafile
+ if neither output nor datafile given, basename output is qdp
+ both .png and .pdf will be appended to output
+     --xcol <int>            set x column in datafile, default 1
+     --ycol <int>            set y columns in datafile, default 2
+     --xlabel <string>       set x axis label, default none
+     --ylabel <string>       set y axis label, default none
+     --xrange <range>        set x axis range, default auto
+     --yrange <range>        set y axis range, default auto
+     --with <string>         set with, default linespoints
+     --lt <string>           set linetype, default 1
+     --lw <float>            set linewdith, default 1
+     --plw <float>           set pointlinewdiths
+     --ps <float>            set pointsizes
+     --pt <int>              set pointtype
+     --pi <int>              set pointinterval (extension to pyxplot)
+     --color <string>        set colors
+     --ti <string>           set data title, default none
+     --plottitle <string>    set plot title, default none
+     --key <string>          set key location, default top right
+     --pre <string>          execute pyxplot commands in  <string> before plotting
+     --header <file>         use <file> as template instead of default
+EOF
   exit 1
 }
 
@@ -205,16 +207,14 @@ shift $((OPTIND-1))
 
 if [ -z "$1" ]; then
    data=`mktemp`
-#   data="qdp.dat"
    cat > $data
 else
   data="$1"
 fi
 
 
-
 if [ -z "$output" ]; then
-  if [ "$data" = "-" ]; then
+  if [ -z "$1" ]; then
     output="qdp"
   else
     output="$1"
