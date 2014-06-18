@@ -1,0 +1,7 @@
+LOAD_ROUTINE ./libprime.so nprimes
+FUNCTION nprimes(n) ROUTINE nprimes
+
+pi1(n) := n/log(n)
+pi2(n) := integral(1/log(t), t, 2, n)
+
+PRINT_FUNCTION nprimes pi1 pi2 MIN 1e5 MAX 2e6 STEP 1e5 FORMAT %g
