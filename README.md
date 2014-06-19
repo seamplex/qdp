@@ -17,8 +17,14 @@ Installation
 ------------
 
 Just copy or symlink the file `qdp` to a binary path, such as `/usr/local/bin` or
-`$HOME/bin` (provided it is in the `PATH` environment variable).
+`$HOME/bin` (provided it is in the `PATH` environment variable). Make sure
+that the `pyxplot` executable can be found system-wide:
 
+    $ which pyxplot
+    /usr/bin/pyxplot
+
+If the output of `which pyxplot` is empty, please first install 
+[pyxplot](http://pyxplot.org.uk).
 
 Usage
 -----
@@ -105,7 +111,7 @@ Distribution of thermal-hydraulic properties of an arbitrarily-powered  vertical
 
 
 
-qdp is copyright &copy; 2013-2014 jeremy theler <jeremy@talador.com.ar>
+qdp is copyright (c) 2013-2014 jeremy theler <jeremy@talador.com.ar>
 licensed under GNU GPL version 3 or later.
 wasora is free software: you are free to change and redistribute it.
-There is NO WARRANTY, to the extent permitted by law.
+There is _NO WARRANTY_, to the extent permitted by law.
