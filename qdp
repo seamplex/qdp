@@ -7,6 +7,10 @@ xcol=1
 ycol=()
 key="above"
 width=12
+dpi=127
+
+pdf=-1
+png=-1
 
 # defaults
 defaultcolor=(blue black green brickred gray turquoise magenta pinegreen sepia burntorange)   
@@ -18,15 +22,15 @@ usage: $0 [options] [-o output] [datafile]
  no datafile indicates stdin
  if no output is given, basename is assumed equal to datafile
  if neither output nor datafile given, basename output is qdp
- both .png and .pdf will be appended to output
+ either .png and .pdf will be appended to output
      --ycol "<ints>"         set y columns in datafile, default all
-     --xcol <int>            set x column in datafile, default 1
+     --xcol <int>            set x column in datafile, default ${xcol}
      --xlabel <string>       set x axis label, default none
      --ylabel <string>       set y axis label, default none
      --xrange <range>        set x axis range, default auto
      --yrange <range>        set y axis range, default auto
      --grid                  set grid, default no
-     --width <float>         set plot width in cm, default 12
+     --width <float>         set plot width in cm, default ${width}
      --with "<strings>"      set plotting styles, default linespoints
      --lt "<strings>"        set linetypes, default 1
      --lw "<floats>"         set linewdiths, default 1
@@ -34,11 +38,14 @@ usage: $0 [options] [-o output] [datafile]
      --ps "<float>"          set pointsizes, default 1
      --pt "<ints>"           set pointtype, default some values
      --pi "<ints>"           set pointinterval (extension to pyxplot)
-     --color "<strings>"     set colors, default some values
+     --color "<strings>"     set colors, default blue, black, green, etc.
      --ti "<strings>"        set column titles, default none
      --plottitle <string>    set plot title, default none
      --key <string>          set key location, default above
      --pre <string>          execute pyxplot commands in  <string> before plotting
+     --pdf                   generate only pdf output, default both
+     --png                   generate only png output, default both
+     --dpi <float>           dpi to use in png output, default ${dpi}
      --header <file>         use <file> as template instead of default
      --debug                 leave the .ppl file for inspection and edition
 
@@ -48,8 +55,34 @@ EOF
   exit 1
 }
 
+ARGS=`getopt -o ":o:h" -l "\
+plottitle:,\
+ti:,\
+xcol:,\
+ycol:,\
+xlabel:,\
+ylabel:,\
+xrange:,\
+yrange:,\
+grid,\
+width:,\
+with:,\
+lt:,\
+lw:,\
+plw:,\
+ps:,\
+pt:,\
+pi:,\
+color:,\
+pre:,\
+header:,\
+key:,\
+pdf,\
+png,\
+dpi:,\
+debug,\
+help" -n "$0" -- "$@"`
 
-ARGS=`getopt -o ":o:h" -l "plottitle:,ti:,xcol:,ycol:,xlabel:,ylabel:,xrange:,yrange:,grid,width:,with:,lt:,lw:,plw:,ps:,pt:,pi:,color:,pre:,header:,key:,debug,,help" -n "$0" -- "$@"`
 # echo $ARGS
 if [ $? -ne 0 ];
 then
@@ -216,6 +249,23 @@ do
       fi
       shift 2;;
 
+    --pdf)
+      pdf=1
+      png=0
+      shift 1;;
+
+    --png)
+      png=1
+      pdf=0
+      shift 1;;
+
+    --dpi)
+      if [ -n "$2" ];
+      then
+        dpi="$2"
+      fi
+      shift 2;;
+
     --debug)
       debug=1
       shift 1;;
@@ -311,9 +361,21 @@ if [ ! -z "$grid" ]; then
 fi
 
 # we translate points to dashes because pdflatex does not like points in filenames
-echo "set terminal pdf" >> ${pplfile}
 escappedoutput=`echo $output | sed s/\\\\./-/g`
-echo "set output \"$escappedoutput.pdf\"" >> ${pplfile}
+if [ ${pdf} -ne 0 ]; then
+ cat << EOF >> ${pplfile}
+set terminal pdf
+set output "${escappedoutput}.pdf"
+EOF
+elif [ ${png} -eq 1 ]; then
+ cat << EOF >> ${pplfile}
+set terminal png dpi ${dpi}
+set output "${escappedoutput}.png"
+EOF
+else
+ echo "error: neither pdf or png output given"
+ exit 1
+fi
 
 ncols=${#ycol[@]}
 
@@ -433,12 +495,15 @@ done
 
 echo >> ${pplfile}
 
+if [[ ${pdf} -ne 1 ]] && [[ ${png} -eq -1 ]]; then
+ cat << EOF >> ${pplfile}
+set terminal png dpi ${dpi}
+set output "${escappedoutput}.png"
+replot
+EOF
+fi
 
-echo "set terminal png dpi 127" >> ${pplfile}
-echo "set output \"$escappedoutput.png\"" >> ${pplfile}
-echo "replot" >> ${pplfile}
-
-
+# call pyxplot
 pyxplot ${pplfile}
 
 if [ ! -z "$debug" ]; then
