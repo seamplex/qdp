@@ -338,24 +338,30 @@ fi
 
 echo >> ${pplfile}
 
-if [ ! -z "$plottitle" ]; then
-  echo "set title \"$plottitle\"" >> ${pplfile}
-fi
-if [ ! -z "$xlabel" ]; then
- echo "set xlabel \"$xlabel\"" >> ${pplfile}
-fi
-if [ ! -z "$ylabel"  ]; then
- echo "set ylabel \"$ylabel\"" >> ${pplfile}
-fi
-if [ ! -z "$xrange" ]; then
- echo "set xrange $xrange" >> ${pplfile}
-fi
-if [ ! -z "$yrange" ]; then
- echo "set yrange $yrange" >> ${pplfile}
-fi
-if [ ! -z "$key" ]; then
- echo "set key $key" >> ${pplfile}
-fi
+# read information from the data file itself
+for field in title xlabel ylabel xrange yrange key; do
+ if [ -z "`eval echo \\$${field}`" ]; then
+   eval ${field}=\"`grep "# ${field}" ${data} | cut -d " " -f3-`\"
+ fi
+done
+
+# quoted fields
+for field in title xlabel ylabel; do
+ #  if not empty, write it into the ppl file
+ if [ ! -z "`eval echo \\$${field}`" ]; then
+  eval echo "set ${field} \\\"\$${field}\\\"" >> ${pplfile}
+ fi
+done
+
+# unquoted
+for field in xrange yrange key; do
+ #  if not empty, write it into the ppl file
+ if [ ! -z "`eval echo \\$${field}`" ]; then
+  eval echo "set ${field} \$${field}" >> ${pplfile}
+ fi
+done
+
+
 if [ ! -z "$grid" ]; then
  echo "set grid" >> ${pplfile}
 fi
