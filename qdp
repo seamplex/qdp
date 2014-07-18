@@ -400,7 +400,7 @@ if [[ -z "${with[0]}" ]] && [[ -z "${pi[0]}" ]] ; then
 #  xn=`grep -v \# $data | tail -n1 | awk -v col=$xcol '{print $col}'`
  n=`grep -v \# $data | wc -l`
  if [ $n -gt 10 ]; then
-  last=`expr ${ncols} - 2`
+  last=`expr ${ncols} - 1`
   for i in `seq 0 ${last}`; do
    pi[$i]=`echo "scale=3; (0.5+${RANDOM}.0/32726.0)*($n/10.0)" | bc`
   done
@@ -409,7 +409,7 @@ fi
 
 # if no titles given, check if the file contains a header with the column title
 if [[ -z "${ti[0]}" ]] && [[ "`head -n1 $data | cut -c1`" == "#" ]]; then
- last=`expr ${ncols} - 2`
+ last=`expr ${ncols} - 1`
  for i in `seq 0 ${last}`; do
   ti[$i]=`head -n1 $data | cut -c1 --complement | awk -v col=${ycol[$i]} '{print $col}' | sed s/_/\\\\\\\\_/`
  done
