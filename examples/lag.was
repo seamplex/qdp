@@ -17,7 +17,7 @@ r[a:b] = 1
 # of characteristic time tau
 y = lag(r, tau)
 
-PRINT t r y
+PRINT t r y HEADER
 
 # exercise: investigate how the result of the lag
 # depends on the time step

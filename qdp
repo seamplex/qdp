@@ -50,7 +50,7 @@ usage: $0 [options] [-o output] [datafile]
      --debug                 leave the .ppl file for inspection and edition
 
  quotes are needed if several columns are to be plotted
- see the examples subdirectory
+ see the README.md file and the examples subdirectory
 EOF
   exit 1
 }

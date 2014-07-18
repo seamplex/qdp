@@ -11,4 +11,4 @@ g(x) := sqrt(cos(x)^2)
 VAR x'
 a = 1
 b = 5
-PRINT_FUNCTION f g integral(f(x')*g(x'),x',1,x) MIN a MAX b STEP (b-a)/100
+PRINT_FUNCTION f g integral(f(x')*g(x'),x',1,x) MIN a MAX b STEP (b-a)/500

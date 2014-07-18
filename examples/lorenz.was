@@ -16,7 +16,7 @@ x_dot .= sigma*(y - x)
 y_dot .= x*(r - z) - y
 z_dot .= x*y - b*z
 
-PRINT t x y z
+PRINT t x y z HEADER
 
 # exercise: play with the system! change
 # the parameters and plot, plot plot!
