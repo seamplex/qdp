@@ -85,8 +85,8 @@ If everything went fine, two figures should have been created: `lag-dat.pdf`
 and `lag-dat.png`, which are ready to be included into your LaTeX article
 or into your web page (respectively).
 
-![lag](https://bitbucket.org/gtheler/qdp/src/cb77fbdd0cbea6b2ed09dfd70aabee6fbf4cb4af/examples/lag-dat.png?at=master)
-
+![lag](https://bytebucket.org/gtheler/qdp/raw/cb77fbdd0cbea6b2ed09dfd70aabee6fbf4cb4af/examples/lag-dat.png)
+      
 Note that the data file `lag.dat` 
 was generated using the tool [wasora](http://www.talador.com.ar/jeremy/wasora/)
 from the input file `lag.was`:
