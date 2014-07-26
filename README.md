@@ -126,21 +126,28 @@ The Lorenz attractor vs time:
 
     $ qdp lorenz.dat --color "brickred navyblue gray" --pi "60 71 87"
 
+![lorenz](https://bytebucket.org/gtheler/qdp/raw/cb77fbdd0cbea6b2ed09dfd70aabee6fbf4cb4af/examples/lorenz-dat.png)
+
 
 Numerical integrals of algebraic expressions:
 
     $ qdp algebraic.dat --ti "\$f(x)\$ \$g(x)\$ \$\\int_0^x{f(x')g(x')\,dx'}\$"
+
+![algebraic](https://bytebucket.org/gtheler/qdp/raw/cb77fbdd0cbea6b2ed09dfd70aabee6fbf4cb4af/examples/algebraic-dat.png)
 
 
 Numbers of primes less than a certain number:
 
     $ qdp nprimes.dat --ti "real \$n/\\ln(n)\$ \$\\int_2^n\\frac{dt}{\\ln(t)}\$" --xlabel "\$n\$" --key "bottom" --pi "1 1 1"
 
+![nprimes](https://bytebucket.org/gtheler/qdp/raw/cb77fbdd0cbea6b2ed09dfd70aabee6fbf4cb4af/examples/nprimes-dat.png)
+
 
 Distribution of thermal-hydraulic properties of an arbitrarily-powered  vertical boiling channel:
 
     $ qdp arbitrary-steady.dat --ti "\$q^\star(z)\$ \$u^\star(z)\$ \$h^\star(z)\$ \$\rho^\star(z)\$" --lw "2 2 1 1" --key bottom --pre "set axis x atzero" --xlabel "\$z\$" --yrange "[-1:2.1]"
 
+![arbitrary-steady](https://bytebucket.org/gtheler/qdp/raw/cb77fbdd0cbea6b2ed09dfd70aabee6fbf4cb4af/examples/arbitrary-steady-dat.png)
 
 
 qdp is copyright (c) 2013-2014 jeremy theler <jeremy@talador.com.ar>
