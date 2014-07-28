@@ -418,6 +418,12 @@ if [[ -z "${ti[0]}" ]] && [[ "`head -n1 $data | cut -c1`" == "#" ]]; then
  fi
 fi
 
+# if only one column was given, then put the title as the ylabel instead
+if [[ $i -eq 1 ]] && [[ -z "$ylabel" ]]; then
+ echo "set ylabel \"${ti[0]}\"" >> ${pplfile}
+ ti[0]=""
+fi
+
 echo "plot \\" >> ${pplfile}
 
 i=0
