@@ -341,7 +341,7 @@ echo >> ${pplfile}
 # read information from the data file itself
 for field in title xlabel ylabel xrange yrange key; do
  if [ -z "`eval echo \\$${field}`" ]; then
-   eval ${field}="`grep \"# ${field}\" ${data} | cut -d \" \" -f3-`"
+   eval ${field}="`grep \"# ${field}\" ${data} | cut -d " " -f3-`"
  fi
 done
 
