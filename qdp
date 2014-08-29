@@ -347,6 +347,8 @@ echo >> ${pplfile}
 title=`grep "# plottitle" ${data} | cut -d' ' -f3-`
 xlabel=`grep "# xlabel" ${data} | cut -d' ' -f3-`
 ylabel=`grep "# ylabel" ${data} | cut -d' ' -f3-`
+xrange=`grep "# xrange" ${data} | cut -d' ' -f3-`
+yrange=`grep "# yrange" ${data} | cut -d' ' -f3-`
 
 # quoted fields
 for field in title xlabel ylabel; do
