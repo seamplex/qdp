@@ -85,7 +85,7 @@ If everything went fine, two figures should have been created: `lag-dat.pdf`
 and `lag-dat.png`, which are ready to be included into your LaTeX article
 or into your web page (respectively).
 
-![lag](https://bytebucket.org/gtheler/qdp/raw/cb77fbdd0cbea6b2ed09dfd70aabee6fbf4cb4af/examples/lag-dat.png)
+![lag](http://www.talador.com.ar/jeremy/qdp/lag-dat.png)
       
 Note that the data file `lag.dat` 
 was generated using the tool [wasora](http://www.talador.com.ar/jeremy/wasora/)
@@ -126,31 +126,31 @@ The Lorenz attractor vs time:
 
     $ qdp lorenz.dat --color "brickred navyblue gray" --pi "60 71 87"
 
-![lorenz](https://bytebucket.org/gtheler/qdp/raw/cb77fbdd0cbea6b2ed09dfd70aabee6fbf4cb4af/examples/lorenz-dat.png)
+![lorenz](http://www.talador.com.ar/jeremy/qdp/lorenz-dat.png)
 
 
 Numerical integrals of algebraic expressions:
 
     $ qdp algebraic.dat --ti "\$f(x)\$ \$g(x)\$ \$\\int_0^x{f(x')g(x')\,dx'}\$"
 
-![algebraic](https://bytebucket.org/gtheler/qdp/raw/cb77fbdd0cbea6b2ed09dfd70aabee6fbf4cb4af/examples/algebraic-dat.png)
+![algebraic](http://www.talador.com.ar/jeremy/qdp/algebraic-dat.png)
 
 
 Numbers of primes less than a certain number:
 
     $ qdp nprimes.dat --ti "real \$n/\\ln(n)\$ \$\\int_2^n\\frac{dt}{\\ln(t)}\$" --xlabel "\$n\$" --key "bottom" --pi "1 1 1"
 
-![nprimes](https://bytebucket.org/gtheler/qdp/raw/cb77fbdd0cbea6b2ed09dfd70aabee6fbf4cb4af/examples/nprimes-dat.png)
+![nprimes](http://www.talador.com.ar/jeremy/qdp/nprimes-dat.png)
 
 
 Distribution of thermal-hydraulic properties of an arbitrarily-powered  vertical boiling channel:
 
     $ qdp arbitrary-steady.dat --ti "\$q^\star(z)\$ \$u^\star(z)\$ \$h^\star(z)\$ \$\rho^\star(z)\$" --lw "2 2 1 1" --key bottom --pre "set axis x atzero" --xlabel "\$z\$" --yrange "[-1:2.1]"
 
-![arbitrary-steady](https://bytebucket.org/gtheler/qdp/raw/cb77fbdd0cbea6b2ed09dfd70aabee6fbf4cb4af/examples/arbitrary-steady-dat.png)
+![arbitrary-steady](http://www.talador.com.ar/jeremy/qdp/arbitrary-steady-dat.png)
 
 
-qdp is copyright (c) 2013-2014 jeremy theler <jeremy@talador.com.ar>
-licensed under GNU GPL version 3 or later.
-wasora is free software: you are free to change and redistribute it.
-There is _NO WARRANTY_, to the extent permitted by law.
+qdp is copyright (c) 2013-2014 jeremy theler <jeremy@talador.com.ar>  
+licensed under GNU GPL version 3 or later.  
+wasora is free software: you are free to change and redistribute it.  
+There is _NO WARRANTY_, to the extent permitted by law.  
