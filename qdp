@@ -345,10 +345,18 @@ echo >> ${pplfile}
 #  fi
 # done
 title=`grep "# plottitle" ${data} | cut -d' ' -f3-`
-xlabel=`grep "# xlabel" ${data} | cut -d' ' -f3-`
-ylabel=`grep "# ylabel" ${data} | cut -d' ' -f3-`
-xrange=`grep "# xrange" ${data} | cut -d' ' -f3-`
-yrange=`grep "# yrange" ${data} | cut -d' ' -f3-`
+if [ -z "${xlabel}" ]; then
+  xlabel=`grep "# xlabel" ${data} | cut -d' ' -f3-`
+fi
+if [ -z "${ylabel}" ]; then
+  ylabel=`grep "# ylabel" ${data} | cut -d' ' -f3-`
+fi
+if [ -z "${xrange}" ]; then
+  xrange=`grep "# xrange" ${data} | cut -d' ' -f3-`
+fi
+if [ -z "${yrange}" ]; then
+  yrange=`grep "# yrange" ${data} | cut -d' ' -f3-`
+fi
 
 # quoted fields
 for field in title xlabel ylabel; do
