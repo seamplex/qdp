@@ -536,3 +536,9 @@ if [ ! -z "$debug" ]; then
 else
  rm ${pplfile}
 fi
+
+# if in interactive mode, show the resulting pdf
+# explanation: http://stackoverflow.com/questions/4261876/check-if-bash-script-was-invoked-from-a-shell-or-another-script-application
+if [[ ! ${pdf} -eq 0 ]] && [[ ! -z "`ps -o stat= -p $PPID | grep s`" ]]; then
+  xdg-open "${escappedoutput}.pdf"
+fi
