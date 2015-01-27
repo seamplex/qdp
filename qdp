@@ -425,14 +425,26 @@ if [[ -z "${ti[0]}" ]] && [[ "`head -n1 $data | cut -c1`" == "#" ]]; then
  last=`expr ${ncols} - 1`
  for i in `seq 0 ${last}`; do
   ti[$i]=`head -n1 $data | cut -c1 --complement | awk -v col=${ycol[$i]} '{print $col}' | sed s/_/\\\\\\\\_/g`
+  # if the title is a single letter, we mark it as LaTeX math
+  if [ `echo -n ${ti[$i]} | wc -m` -eq 1 ]; then
+    ti[$i]="\$${ti[$i]}\$"
+  fi
  done
  if [ -z "$xlabel" ]; then
+  # if the xlabel is a single letter, we mark it as LaTeX math
+  if [ `echo -n ${xlabel} | wc -m` -eq 1 ]; then
+    xlabel="\$${xlabel}\$"
+  fi
   echo "set xlabel \"`head -n1 $data | cut -c1 --complement | awk -v col=${xcol} '{print $col}' | sed s/_/\\\\\\\\_/g`\"" >> ${pplfile}
  fi
 fi
 
 # if only one column was given, then put the title as the ylabel instead
 if [[ $i -eq 1 ]] && [[ -z "$ylabel" ]]; then
+ # if the xlabel is a single letter, we mark it as LaTeX math
+ if [ `echo -n ${ylabel} | wc -m` -eq 1 ]; then
+   ylabel="\$${ylabel}\$"
+ fi
  echo "set ylabel \"${ti[0]}\"" >> ${pplfile}
  ti[0]=""
 fi
