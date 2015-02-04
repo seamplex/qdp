@@ -430,22 +430,24 @@ if [[ -z "${ti[0]}" ]] && [[ "`head -n1 $data | cut -c1`" == "#" ]]; then
     ti[$i]="\$${ti[$i]}\$"
   fi
  done
- if [ -z "$xlabel" ]; then
+ if [ -z "${xlabel}" ]; then
   # if the xlabel is a single letter, we mark it as LaTeX math
+  xlabel=`head -n1 $data | cut -c1 --complement | awk -v col=${xcol} '{print $col}' | sed s/_/\\\\\\\\_/g`
   if [ `echo -n ${xlabel} | wc -m` -eq 1 ]; then
     xlabel="\$${xlabel}\$"
   fi
-  echo "set xlabel \"`head -n1 $data | cut -c1 --complement | awk -v col=${xcol} '{print $col}' | sed s/_/\\\\\\\\_/g`\"" >> ${pplfile}
+  echo "set xlabel \"${xlabel}\"" >> ${pplfile}
  fi
 fi
 
 # if only one column was given, then put the title as the ylabel instead
-if [[ $i -eq 1 ]] && [[ -z "$ylabel" ]]; then
+if [[ $i -eq 1 ]] && [[ -z "${ylabel}" ]]; then
+ ylabel=${ti[0]}
  # if the xlabel is a single letter, we mark it as LaTeX math
  if [ `echo -n ${ylabel} | wc -m` -eq 1 ]; then
    ylabel="\$${ylabel}\$"
  fi
- echo "set ylabel \"${ti[0]}\"" >> ${pplfile}
+ echo "set ylabel \"${ylabel}\"" >> ${pplfile}
  ti[0]=""
 fi
 
